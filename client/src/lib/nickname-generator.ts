@@ -36,11 +36,17 @@ const themeWords = {
 
 // Enhanced syllable patterns for more natural generation
 const syllablePatterns = {
-  consonants: ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z"],
+  consonants: ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v", "w", "x", "z"],
   vowels: ["a", "e", "i", "o", "u"],
   consonantClusters: ["br", "cr", "dr", "fr", "gr", "pr", "tr", "bl", "cl", "fl", "gl", "pl", "sl", "sp", "st", "sc", "sk", "sm", "sn", "sw"],
   vowelCombinations: ["ai", "au", "ea", "ei", "ie", "oa", "ou", "ue"],
-  endings: ["er", "ar", "or", "en", "an", "on", "ex", "ax", "ix", "ox", "ux"]
+  endings: ["er", "ar", "or", "en", "an", "on", "ex", "ax", "ix", "ox", "ux"],
+  // More attractive consonant combinations
+  attractiveConsonants: ["k", "x", "z", "v", "j", "r", "s", "t", "n", "m"],
+  // More melodic vowel patterns
+  melodicVowels: ["a", "e", "i", "o"],
+  // Gaming-friendly letter combinations
+  gamingCombos: ["x", "z", "k", "v", "j", "q"]
 };
 
 // Advanced syllable combinations for different themes
@@ -101,6 +107,195 @@ const additionalWords = {
 
 function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
+}
+
+// Enhanced word filtering for better combinations
+function getAttractiveWord(wordArray: string[], minLength: number = 3, maxLength: number = 8): string {
+  // Filter words by length and attractiveness
+  const filtered = wordArray.filter(word => 
+    word.length >= minLength && 
+    word.length <= maxLength &&
+    !word.toLowerCase().includes('xxx') && // Avoid awkward combinations
+    !/(.)\1{2,}/.test(word.toLowerCase()) // Avoid too many repeated letters
+  );
+  return getRandomElement(filtered.length > 0 ? filtered : wordArray);
+}
+
+// Smart combination validator to avoid awkward results
+function isGoodCombination(word1: string, word2: string): boolean {
+  const combined = (word1 + word2).toLowerCase();
+  
+  // Avoid awkward letter combinations
+  const awkwardPatterns = [
+    /(.)\1{3,}/, // Too many repeated letters
+    /[aeiou]{4,}/, // Too many consecutive vowels
+    /[bcdfghjklmnpqrstvwxyz]{5,}/, // Too many consecutive consonants
+    /(ss|zz|qq|xx)/, // Awkward double letters
+    /^(.{1,2})\1+$/ // Simple repetitions
+  ];
+  
+  return !awkwardPatterns.some(pattern => pattern.test(combined));
+}
+
+// Enhanced capitalization with more sophisticated patterns
+function applySmartCapitalization(nickname: string, useCapitalization: boolean): string {
+  if (!useCapitalization) {
+    return nickname.toLowerCase();
+  }
+  
+  const styles = [
+    // Standard first letter caps (40%)
+    () => nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase(),
+    
+    // Smart CamelCase (25%)
+    () => {
+      let result = nickname.toLowerCase();
+      // Find natural word boundaries and capitalize
+      const boundaries = [];
+      for (let i = 1; i < result.length - 1; i++) {
+        const prev = result[i - 1];
+        const curr = result[i];
+        const next = result[i + 1];
+        
+        // Capitalize after vowel-consonant or consonant-vowel transitions
+        if ((/[aeiou]/.test(prev) && /[bcdfghjklmnpqrstvwxyz]/.test(curr)) ||
+            (/[bcdfghjklmnpqrstvwxyz]/.test(prev) && /[aeiou]/.test(curr))) {
+          if (Math.random() < 0.4) boundaries.push(i);
+        }
+      }
+      
+      for (const boundary of boundaries) {
+        result = result.substring(0, boundary) + result.charAt(boundary).toUpperCase() + result.substring(boundary + 1);
+      }
+      return result.charAt(0).toUpperCase() + result.slice(1);
+    },
+    
+    // Alternating caps for short words (15%)
+    () => {
+      if (nickname.length <= 6) {
+        return nickname.split('').map((char, i) => 
+          i % 2 === 0 ? char.toUpperCase() : char.toLowerCase()
+        ).join('');
+      }
+      return nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+    },
+    
+    // Strategic mid-word caps (20%)
+    () => {
+      let result = nickname.toLowerCase();
+      if (result.length > 4) {
+        const midPoint = Math.floor(result.length / 2);
+        result = result.substring(0, midPoint) + result.charAt(midPoint).toUpperCase() + result.substring(midPoint + 1);
+      }
+      return result.charAt(0).toUpperCase() + result.slice(1);
+    }
+  ];
+  
+  const weights = [40, 25, 15, 20];
+  const random = Math.random() * 100;
+  let cumulative = 0;
+  
+  for (let i = 0; i < weights.length; i++) {
+    cumulative += weights[i];
+    if (random <= cumulative) {
+      return styles[i]();
+    }
+  }
+  
+  return styles[0](); // Fallback
+}
+
+// Enhanced number patterns for more attractive results
+function addAttractiveNumbers(nickname: string, maxLength: number, includeNumbers: boolean): string {
+  if (!includeNumbers || nickname.length >= maxLength - 1) {
+    return nickname;
+  }
+  
+  const availableSpace = maxLength - nickname.length;
+  
+  // Attractive number patterns
+  const numberPatterns = [
+    // Classic gaming numbers (higher weight)
+    () => getRandomElement(["7", "13", "21", "42", "69", "88", "99", "777", "420", "666"]),
+    
+    // Birth years and decades  
+    () => getRandomElement(["90", "95", "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]),
+    
+    // Popular gaming sequences
+    () => getRandomElement(["123", "321", "111", "222", "333", "007", "360", "404"]),
+    
+    // Simple but effective
+    () => getRandomElement(["1", "2", "3", "5", "8", "9", "11", "22", "33"]),
+    
+    // Double digits
+    () => getRandomElement(["12", "23", "34", "45", "56", "67", "78", "89", "10", "20", "30"]),
+    
+    // Random but limited range for better aesthetics
+    () => String(Math.floor(Math.random() * 999) + 1)
+  ];
+  
+  const weights = [35, 20, 20, 10, 10, 5]; // Prefer attractive patterns
+  const random = Math.random() * 100;
+  let cumulative = 0;
+  let numberStr = "";
+  
+  for (let i = 0; i < weights.length; i++) {
+    cumulative += weights[i];
+    if (random <= cumulative) {
+      numberStr = numberPatterns[i]();
+      break;
+    }
+  }
+  
+  // Ensure it fits
+  if (numberStr.length > availableSpace) {
+    numberStr = numberStr.substring(0, availableSpace);
+  }
+  
+  // Strategic placement
+  const placement = Math.random();
+  if (placement < 0.1 && nickname.length + numberStr.length <= maxLength) {
+    // Prefix (rare, but effective for some cases)
+    return numberStr + nickname;
+  } else if (placement < 0.25 && nickname.length > 4 && nickname.length + numberStr.length <= maxLength) {
+    // Insert in middle for longer names
+    const insertPos = Math.floor(nickname.length * 0.7);
+    return nickname.substring(0, insertPos) + numberStr + nickname.substring(insertPos);
+  } else {
+    // Suffix (most common and usually best looking)
+    return nickname + numberStr;
+  }
+}
+
+// Enhanced special character patterns
+function addAttractiveSpecialChars(nickname: string, maxLength: number, includeSpecialChars: boolean): string {
+  if (!includeSpecialChars || nickname.length >= maxLength - 1) {
+    return nickname;
+  }
+  
+  // More attractive special character combinations
+  const charPatterns = [
+    // Gaming-style underscores and hyphens
+    "_", "-", ".", 
+    // More unique but still readable
+    "x", "X", "v", "V",
+    // Rarely used but distinctive
+    "!", "*", "+", "^"
+  ];
+  
+  const char = getRandomElement(charPatterns);
+  const placement = Math.random();
+  
+  if (placement < 0.2 && nickname.length + char.length <= maxLength) {
+    // Middle insertion for compound feel
+    const midPoint = Math.floor(nickname.length / 2);
+    return nickname.substring(0, midPoint) + char + nickname.substring(midPoint);
+  } else if (nickname.length + char.length <= maxLength) {
+    // End placement
+    return nickname + char;
+  }
+  
+  return nickname;
 }
 
 function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, includeSpecialChars: boolean, useCapitalization: boolean = true): string {
@@ -249,76 +444,13 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
     }
   }
   
-  // Add numbers with varied placement
-  if (includeNumbers && nickname.length < maxLength) {
-    const maxDigits = Math.min(numberSpace, maxLength - nickname.length);
-    const maxNumber = Math.pow(10, maxDigits) - 1;
-    const number = Math.floor(Math.random() * maxNumber) + 1;
-    const numberStr = number.toString();
-    
-    // Random placement: beginning, middle, or end
-    const placement = Math.random();
-    if (placement < 0.2 && nickname.length + numberStr.length <= maxLength) {
-      // Beginning
-      nickname = numberStr + nickname;
-    } else if (placement < 0.4 && nickname.length > 2 && nickname.length + numberStr.length <= maxLength) {
-      // Middle
-      const midPoint = Math.floor(nickname.length / 2);
-      nickname = nickname.substring(0, midPoint) + numberStr + nickname.substring(midPoint);
-    } else if (nickname.length + numberStr.length <= maxLength) {
-      // End (most common)
-      nickname += numberStr;
-    }
-  }
-  
-  // Add special characters creatively
-  if (includeSpecialChars && nickname.length < maxLength) {
-    const specialChars = ["_", "-", ".", "!", "*", "+", "=", "^"];
-    const char = getRandomElement(specialChars);
-    
-    // Random placement for special characters too
-    const placement = Math.random();
-    if (placement < 0.3 && nickname.length + char.length <= maxLength) {
-      // Add at random position
-      const pos = Math.floor(Math.random() * nickname.length);
-      nickname = nickname.substring(0, pos) + char + nickname.substring(pos);
-    } else if (nickname.length + char.length <= maxLength) {
-      // Add at end
-      nickname += char;
-    }
-  }
+  // Add attractive numbers and special characters
+  nickname = addAttractiveNumbers(nickname, maxLength, includeNumbers);
+  nickname = addAttractiveSpecialChars(nickname, maxLength, includeSpecialChars);
 
-  // Apply capitalization with more variety
+  // Apply smart capitalization
   if (nickname.length > 0) {
-    if (useCapitalization) {
-      // Various capitalization patterns
-      const capPattern = Math.random();
-      if (capPattern < 0.4) {
-        // Standard: First letter uppercase
-        nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
-      } else if (capPattern < 0.6) {
-        // Camel case for compound words
-        nickname = nickname.toLowerCase();
-        for (let i = 1; i < nickname.length - 1; i++) {
-          if (Math.random() < 0.3) {
-            nickname = nickname.substring(0, i) + nickname.charAt(i).toUpperCase() + nickname.substring(i + 1);
-          }
-        }
-        nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
-      } else if (capPattern < 0.8) {
-        // All lowercase with first uppercase
-        nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
-      } else {
-        // Random caps
-        let result = "";
-        for (let i = 0; i < nickname.length; i++) {
-          result += Math.random() < 0.3 ? nickname.charAt(i).toUpperCase() : nickname.charAt(i).toLowerCase();
-        }
-        nickname = result;
-      }
-    } else {
-      nickname = nickname.toLowerCase();
-    }
+    nickname = applySmartCapitalization(nickname, useCapitalization);
   }
   
   // Final length check and cleanup
@@ -358,9 +490,14 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
       };
       syllable = getRandomElement(advancedSyllables[themeMapping[theme]]);
     } else if (approach < 0.7) {
-      // Generate phonetic syllables
-      const consonant = getRandomElement(syllablePatterns.consonants);
-      const vowel = getRandomElement(syllablePatterns.vowels);
+      // Generate more attractive phonetic syllables
+      const useAttractive = Math.random() > 0.3;
+      const consonant = useAttractive ? 
+        getRandomElement(syllablePatterns.attractiveConsonants) : 
+        getRandomElement(syllablePatterns.consonants);
+      const vowel = useAttractive ? 
+        getRandomElement(syllablePatterns.melodicVowels) : 
+        getRandomElement(syllablePatterns.vowels);
       const ending = Math.random() > 0.5 && remainingSpace > 2 ? getRandomElement(syllablePatterns.consonants) : "";
       syllable = consonant + vowel + ending;
     } else if (approach < 0.85) {
@@ -622,36 +759,11 @@ function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLe
     nickname = nickname.substring(0, baseSpace);
   }
   
-  // Apply capitalization only if requested
-  if (useCapitalization) {
-    if (Math.random() > 0.5) {
-      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
-    } else {
-      // CamelCase style
-      const parts = nickname.match(/.{1,4}/g) || [nickname];
-      nickname = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
-    }
-  } else {
-    nickname = nickname.toLowerCase();
-  }
+  // Apply smart capitalization for temático algorithm too
+  nickname = applySmartCapitalization(nickname, useCapitalization);
   
-  // Force add numbers if requested
-  if (includeNumbers) {
-    const availableSpace = maxLength - nickname.length;
-    if (availableSpace >= 1) {
-      const maxNumber = Math.pow(10, Math.min(3, availableSpace)) - 1;
-      const number = Math.floor(Math.random() * maxNumber) + 1;
-      const numberStr = number.toString();
-      
-      if (Math.random() > 0.7 && numberStr.length <= availableSpace) {
-        // Add at beginning
-        nickname = numberStr + nickname;
-      } else if (numberStr.length <= availableSpace) {
-        // Add at end
-        nickname = nickname + numberStr;
-      }
-    }
-  }
+  // Add attractive numbers for temático algorithm
+  nickname = addAttractiveNumbers(nickname, maxLength, includeNumbers);
   
   // Ensure minimum length
   while (nickname.length < minLength && nickname.length < maxLength) {
