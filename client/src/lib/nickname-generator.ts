@@ -56,7 +56,7 @@ function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, includeSpecialChars: boolean): string {
+function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, includeSpecialChars: boolean, useCapitalization: boolean = true): string {
   const words = themeWords[theme];
   
   // Calculate space allocation
@@ -136,6 +136,13 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
       }
       break;
     }
+  }
+
+  // Apply capitalization only if requested
+  if (nickname.length > 0 && useCapitalization) {
+    nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+  } else if (nickname.length > 0) {
+    nickname = nickname.toLowerCase();
   }
   
   // Final length check
@@ -369,7 +376,7 @@ export function generateNicknames(params: GenerationParameters): string[] {
     
     switch (algorithm) {
       case "random":
-        nickname = generateRandomNickname(theme, minLength, maxLength, includeNumbers, includeSpecialChars);
+        nickname = generateRandomNickname(theme, minLength, maxLength, includeNumbers, includeSpecialChars, useCapitalization);
         break;
       case "syllabic":
         nickname = generateSyllabicNickname(theme, minLength, maxLength, includeNumbers, useCapitalization);
@@ -378,15 +385,10 @@ export function generateNicknames(params: GenerationParameters): string[] {
         nickname = generateThematicNickname(theme, minLength, maxLength, includeNumbers, useCapitalization);
         break;
       default:
-        nickname = generateRandomNickname(theme, minLength, maxLength, includeNumbers, includeSpecialChars);
+        nickname = generateRandomNickname(theme, minLength, maxLength, includeNumbers, includeSpecialChars, useCapitalization);
     }
     
-    // Apply final capitalization rules
-    if (useCapitalization && algorithm !== "thematic") {
-      if (Math.random() > 0.5) {
-        nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
-      }
-    }
+    // Final capitalization is now handled within each algorithm function
     
     // Ensure uniqueness in this generation batch
     if (!generatedSet.has(nickname.toLowerCase())) {
