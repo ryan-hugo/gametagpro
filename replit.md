@@ -2,7 +2,7 @@
 
 ## Overview
 
-GameName Generator is a modern web application that generates gaming nicknames using various algorithms and themes. Built with React on the frontend and Express.js on the backend, it provides users with an intuitive interface to create personalized gaming usernames. The application features real-time generation, favorites management, search functionality, and user statistics tracking.
+GameName Generator is a modern web application that generates gaming nicknames using various algorithms and themes with multi-language support. Built with React on the frontend and Express.js on the backend, it provides users with an intuitive interface to create personalized gaming usernames in 6 different languages. The application features real-time generation, favorites management, search functionality, user statistics tracking, and advanced customization options including complexity levels, style variants, and preference filters.
 
 ## User Preferences
 
@@ -39,7 +39,18 @@ Preferred communication style: Simple, everyday language.
   - Syllabic: Phonetically-based combinations for pronounceable names
   - Thematic: Context-aware generation based on selected themes
 - **Themes**: Six categories (fantasy, sci-fi, military, cute, edgy, neutral) with theme-specific word banks
-- **Customization**: Configurable parameters for length, style, and complexity
+- **Multi-language Support**: Six supported languages with native word dictionaries:
+  - Portuguese Brazilian (pt-br) - Default language
+  - English (en)
+  - Spanish (es)
+  - French (fr)
+  - German (de)
+  - Italian (it)
+- **Advanced Customization**: 
+  - Complexity levels: Simple, Medium, Complex
+  - Style variants: Classic, Modern, Unique, Professional
+  - Preference filters: Avoid common words, prefer short words
+  - Enhanced character options with language-aware special characters
 
 ### Development Environment
 - **Hot Reload**: Vite development server with HMR for instant feedback

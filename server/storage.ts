@@ -33,6 +33,9 @@ export class MemStorage implements IStorage {
     const nickname: Nickname = {
       ...insertNickname,
       id,
+      language: insertNickname.language ?? "en",
+      style: insertNickname.style ?? "classic", 
+      complexity: insertNickname.complexity ?? "medium",
       isFavorite: insertNickname.isFavorite ?? false,
       copyCount: insertNickname.copyCount ?? 0,
       createdAt: new Date(),

@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertNicknameSchema, insertGenerationHistorySchema, generationParameters } from "@shared/schema";
-import { generateNicknames } from "../client/src/lib/nickname-generator";
+import { generateNicknames } from "../client/src/lib/nickname-generator-v2";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Generate nicknames
@@ -21,6 +21,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             name,
             theme: params.theme,
             algorithm: params.algorithm,
+            language: params.language || "en",
+            style: params.style || "classic",
+            complexity: params.complexity || "medium",
             length: name.length,
             isFavorite: false,
             copyCount: 0,
