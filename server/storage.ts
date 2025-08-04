@@ -9,6 +9,7 @@ export interface IStorage {
   toggleFavorite(id: string): Promise<Nickname | undefined>;
   incrementCopyCount(id: string): Promise<Nickname | undefined>;
   searchNicknames(query: string): Promise<Nickname[]>;
+  clearGeneratedNicknames(): Promise<void>;
   
   // Generation history operations
   createGenerationHistory(history: InsertGenerationHistory): Promise<GenerationHistory>;
@@ -79,6 +80,13 @@ export class MemStorage implements IStorage {
         nickname.theme.toLowerCase().includes(lowercaseQuery)
       )
       .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async clearGeneratedNicknames(): Promise<void> {
+    // Keep only favorite nicknames, clear the rest
+    const favorites = Array.from(this.nicknames.values()).filter(nickname => nickname.isFavorite);
+    this.nicknames.clear();
+    favorites.forEach(nickname => this.nicknames.set(nickname.id, nickname));
   }
 
   async createGenerationHistory(insertHistory: InsertGenerationHistory): Promise<GenerationHistory> {

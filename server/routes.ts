@@ -11,6 +11,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const params = generationParameters.parse(req.body);
       const sessionId = req.headers["x-session-id"] as string || "default";
       
+      // Clear previous generated nicknames (keeping favorites)
+      await storage.clearGeneratedNicknames();
+      
       // Generate nicknames using the algorithm
       const generatedNames = generateNicknames(params);
       
