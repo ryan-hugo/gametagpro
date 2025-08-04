@@ -11,22 +11,10 @@ interface NicknameCardProps {
   index?: number;
 }
 
-const themeColors = {
-  fantasy: "text-neon-purple bg-neon-purple",
-  "sci-fi": "text-electric-blue bg-electric-blue",
-  military: "text-gray-300 bg-gray-600",
-  cute: "text-pink-400 bg-pink-400",
-  edgy: "text-red-400 bg-red-400",
-  neutral: "text-green-400 bg-green-400",
-};
-
-const themeGradients = {
-  fantasy: "from-neon-purple/10 to-pink-500/10 border-neon-purple/20 hover:border-neon-purple",
-  "sci-fi": "from-electric-blue/10 to-cyan-500/10 border-electric-blue/20 hover:border-electric-blue",
-  military: "from-gray-500/10 to-gray-600/10 border-gray-500/20 hover:border-gray-400",
-  cute: "from-pink-500/10 to-pink-400/10 border-pink-500/20 hover:border-pink-400",
-  edgy: "from-red-500/10 to-pink-500/10 border-red-500/20 hover:border-red-400",
-  neutral: "from-green-500/10 to-emerald-500/10 border-green-500/20 hover:border-green-400",
+const algorithmColors = {
+  random: "text-electric-blue bg-electric-blue",
+  syllabic: "text-neon-purple bg-neon-purple", 
+  thematic: "text-neon-green bg-neon-green",
 };
 
 export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
@@ -80,22 +68,21 @@ export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
     toggleFavoriteMutation.mutate();
   };
 
-  const themeColor = themeColors[nickname.theme as keyof typeof themeColors] || themeColors.neutral;
-  const gradientClass = themeGradients[nickname.theme as keyof typeof themeGradients] || themeGradients.neutral;
+  const algorithmColor = algorithmColors[nickname.algorithm as keyof typeof algorithmColors] || algorithmColors.random;
   const isFavorite = nickname.isFavorite;
 
   return (
     <div
-      className={`group bg-gradient-to-br ${
-        isFavorite ? gradientClass : "bg-dark-tertiary border border-gray-600 hover:border-electric-blue"
+      className={`group ${
+        isFavorite 
+          ? "bg-gradient-to-br from-electric-blue/10 to-neon-purple/10 border border-electric-blue/30 hover:border-electric-blue" 
+          : "bg-dark-tertiary border border-gray-600 hover:border-electric-blue"
       } rounded-lg p-4 hover:shadow-lg hover:shadow-electric-blue/10 transition-all duration-300 animate-slide-up cursor-pointer`}
       style={{ animationDelay: `${index * 0.05}s` }}
       onClick={handleCopy}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className={`font-gaming text-lg font-semibold ${
-          isFavorite ? themeColor.split(' ')[0] : "text-electric-blue"
-        }`}>
+        <span className="font-gaming text-lg font-semibold text-electric-blue">
           {nickname.name}
         </span>
         <Button
@@ -120,9 +107,10 @@ export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className={`text-xs px-2 py-1 rounded-full ${themeColor.split(' ')[1]}/20 ${themeColor.split(' ')[0]}`}>
-            {nickname.theme === "sci-fi" ? "Sci-Fi" : 
-             nickname.theme.charAt(0).toUpperCase() + nickname.theme.slice(1)}
+          <span className={`text-xs px-2 py-1 rounded-full ${algorithmColor.split(' ')[1]}/20 ${algorithmColor.split(' ')[0]}`}>
+            {nickname.algorithm === "random" ? "Aleatório" : 
+             nickname.algorithm === "syllabic" ? "Silábico" :
+             nickname.algorithm === "thematic" ? "Temático" : nickname.algorithm}
           </span>
           <span className="text-xs text-gray-400">
             {nickname.length} chars

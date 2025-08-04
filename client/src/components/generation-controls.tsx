@@ -7,12 +7,6 @@ import {
   Dice1, 
   SpellCheck, 
   Wand2, 
-  Crown, 
-  Rocket, 
-  Crosshair, 
-  Heart, 
-  Skull, 
-  Globe,
   RotateCcw,
   Download
 } from "lucide-react";
@@ -33,14 +27,7 @@ const algorithmIcons = {
   thematic: Wand2,
 };
 
-const themeIcons = {
-  fantasy: Crown,
-  "sci-fi": Rocket,
-  military: Crosshair,
-  cute: Heart,
-  edgy: Skull,
-  neutral: Globe,
-};
+
 
 interface GenerationControlsProps {
   onGenerate?: () => void;
@@ -54,7 +41,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
     resolver: zodResolver(generationParameters),
     defaultValues: {
       algorithm: "random",
-      theme: "fantasy",
+      theme: "neutral",
       minLength: 4,
       maxLength: 12,
       includeNumbers: true,
@@ -101,8 +88,8 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
       const response = await apiRequest("GET", "/api/nicknames?limit=1000");
       const nicknames = await response.json();
       
-      const csvContent = nicknames.map((n: any) => `${n.name},${n.theme},${n.algorithm},${n.length}`).join('\n');
-      const blob = new Blob([`Name,Theme,Algorithm,Length\n${csvContent}`], { type: 'text/csv' });
+      const csvContent = nicknames.map((n: any) => `${n.name},${n.algorithm},${n.length}`).join('\n');
+      const blob = new Blob([`Name,Algorithm,Length\n${csvContent}`], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
@@ -176,50 +163,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
               />
             </div>
 
-            {/* Theme Selection */}
-            <div>
-              <Label className="text-sm font-semibold text-white mb-3 block">
-                Tema do Jogo
-              </Label>
-              <FormField
-                control={form.control}
-                name="theme"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(["fantasy", "sci-fi", "military", "cute", "edgy", "neutral"] as const).map((theme) => {
-                          const Icon = themeIcons[theme];
-                          const isSelected = field.value === theme;
-                          return (
-                            <Button
-                              key={theme}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className={`btn-visible p-3 font-medium ${
-                                isSelected
-                                  ? "bg-neon-purple/20 border-neon-purple text-neon-purple font-semibold"
-                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-neon-purple hover:text-white"
-                              }`}
-                              onClick={() => field.onChange(theme)}
-                            >
-                              <Icon className="mr-1 h-3 w-3" />
-                              {theme === "fantasy" && "Fantasy"}
-                              {theme === "sci-fi" && "Sci-Fi"}
-                              {theme === "military" && "Military"}
-                              {theme === "cute" && "Cute"}
-                              {theme === "edgy" && "Edgy"}
-                              {theme === "neutral" && "Neutro"}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+
 
             {/* Length Settings */}
             <div>
