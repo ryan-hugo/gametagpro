@@ -137,7 +137,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* Algorithm Selection */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="text-sm font-semibold text-white mb-3 block">
                 Algoritmo de Geração
               </Label>
               <FormField
@@ -155,10 +155,10 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                               key={algo}
                               type="button"
                               variant="outline"
-                              className={`p-3 justify-start ${
+                              className={`btn-visible p-3 justify-start font-medium ${
                                 isSelected
-                                  ? "bg-electric-blue bg-opacity-20 border-electric-blue text-electric-blue"
-                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                                  ? "bg-electric-blue/20 border-electric-blue text-electric-blue font-semibold"
+                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white"
                               }`}
                               onClick={() => field.onChange(algo)}
                             >
@@ -178,7 +178,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
 
             {/* Theme Selection */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="text-sm font-semibold text-white mb-3 block">
                 Tema do Jogo
               </Label>
               <FormField
@@ -197,10 +197,10 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                               type="button"
                               variant="outline"
                               size="sm"
-                              className={`p-3 ${
+                              className={`btn-visible p-3 font-medium ${
                                 isSelected
-                                  ? "bg-neon-purple bg-opacity-20 border-neon-purple text-neon-purple"
-                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                                  ? "bg-neon-purple/20 border-neon-purple text-neon-purple font-semibold"
+                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-neon-purple hover:text-white"
                               }`}
                               onClick={() => field.onChange(theme)}
                             >
@@ -223,7 +223,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
 
             {/* Length Settings */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="text-sm font-semibold text-white mb-3 block">
                 Comprimento
               </Label>
               <div className="space-y-4">
@@ -233,8 +233,8 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between mb-2">
-                        <Label className="text-sm text-gray-400">Mínimo</Label>
-                        <span className="text-sm text-electric-blue font-gaming">
+                        <Label className="text-sm text-gray-300 font-medium">Mínimo</Label>
+                        <span className="text-sm text-electric-blue font-gaming font-bold">
                           {field.value}
                         </span>
                       </div>
@@ -257,8 +257,8 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between mb-2">
-                        <Label className="text-sm text-gray-400">Máximo</Label>
-                        <span className="text-sm text-electric-blue font-gaming">
+                        <Label className="text-sm text-gray-300 font-medium">Máximo</Label>
+                        <span className="text-sm text-electric-blue font-gaming font-bold">
                           {field.value}
                         </span>
                       </div>
@@ -280,7 +280,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
 
             {/* Character Options */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="text-sm font-semibold text-white mb-3 block">
                 Caracteres
               </Label>
               <div className="space-y-3">
@@ -288,15 +288,15 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   control={form.control}
                   name="includeNumbers"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
+                    <FormItem className="flex items-center space-x-3">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue border-2 w-5 h-5"
                         />
                       </FormControl>
-                      <Label className="text-sm text-gray-300">Números</Label>
+                      <Label className="text-sm text-gray-300 font-medium cursor-pointer">Números</Label>
                     </FormItem>
                   )}
                 />
@@ -304,15 +304,15 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   control={form.control}
                   name="includeSpecialChars"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
+                    <FormItem className="flex items-center space-x-3">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue border-2 w-5 h-5"
                         />
                       </FormControl>
-                      <Label className="text-sm text-gray-300">Caracteres especiais</Label>
+                      <Label className="text-sm text-gray-300 font-medium cursor-pointer">Caracteres especiais</Label>
                     </FormItem>
                   )}
                 />
@@ -320,15 +320,15 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   control={form.control}
                   name="useCapitalization"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
+                    <FormItem className="flex items-center space-x-3">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                          className="data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue border-2 w-5 h-5"
                         />
                       </FormControl>
-                      <Label className="text-sm text-gray-300">Capitalização</Label>
+                      <Label className="text-sm text-gray-300 font-medium cursor-pointer">Capitalização</Label>
                     </FormItem>
                   )}
                 />
@@ -343,8 +343,8 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between mb-2">
-                      <Label className="text-sm font-medium text-gray-300">Quantidade</Label>
-                      <span className="text-sm text-neon-green font-gaming">
+                      <Label className="text-sm font-semibold text-white">Quantidade</Label>
+                      <span className="text-sm text-neon-green font-gaming font-bold">
                         {field.value}
                       </span>
                     </div>
