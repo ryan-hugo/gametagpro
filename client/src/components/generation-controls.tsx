@@ -14,11 +14,7 @@ import {
   Skull, 
   Globe,
   RotateCcw,
-  Download,
-  Languages,
-  Settings,
-  Palette,
-  Zap
+  Download
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,9 +25,7 @@ import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { generationParameters, type GenerationParameters, supportedLanguages, complexityLevels, nicknameStyles } from "@shared/schema";
-import { languageNames } from "@/lib/language-dictionaries";
-import { generateNicknames } from "@/lib/nickname-generator-v2";
+import { generationParameters, type GenerationParameters } from "@shared/schema";
 
 const algorithmIcons = {
   random: Dice1,
@@ -61,16 +55,11 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
     defaultValues: {
       algorithm: "random",
       theme: "fantasy",
-      language: "pt-br",
       minLength: 4,
       maxLength: 12,
       includeNumbers: true,
       includeSpecialChars: false,
       useCapitalization: true,
-      complexity: "medium",
-      style: "classic",
-      avoidCommonWords: false,
-      preferShortWords: false,
       count: 24,
     },
   });
@@ -232,129 +221,6 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
               />
             </div>
 
-            {/* Language Selection */}
-            <div>
-              <Label className="text-sm font-semibold text-white mb-3 block">
-                <Languages className="inline mr-2 h-4 w-4" />
-                Idioma
-              </Label>
-              <FormField
-                control={form.control}
-                name="language"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(["pt-br", "en", "es", "fr", "de", "it"] as const).map((language) => {
-                          const isSelected = field.value === language;
-                          return (
-                            <Button
-                              key={language}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className={`btn-visible p-2 font-medium text-xs ${
-                                isSelected
-                                  ? "bg-neon-green/20 border-neon-green text-neon-green font-semibold"
-                                  : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-neon-green hover:text-white"
-                              }`}
-                              onClick={() => field.onChange(language)}
-                            >
-                              {languageNames[language]}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Complexity & Style */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-semibold text-white mb-3 block">
-                  <Settings className="inline mr-2 h-4 w-4" />
-                  Complexidade
-                </Label>
-                <FormField
-                  control={form.control}
-                  name="complexity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="space-y-2">
-                          {(["simple", "medium", "complex"] as const).map((complexity) => {
-                            const isSelected = field.value === complexity;
-                            return (
-                              <Button
-                                key={complexity}
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className={`btn-visible w-full p-2 font-medium text-xs ${
-                                  isSelected
-                                    ? "bg-electric-blue/20 border-electric-blue text-electric-blue font-semibold"
-                                    : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white"
-                                }`}
-                                onClick={() => field.onChange(complexity)}
-                              >
-                                {complexity === "simple" && "Simples"}
-                                {complexity === "medium" && "Médio"}
-                                {complexity === "complex" && "Complexo"}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div>
-                <Label className="text-sm font-semibold text-white mb-3 block">
-                  <Palette className="inline mr-2 h-4 w-4" />
-                  Estilo
-                </Label>
-                <FormField
-                  control={form.control}
-                  name="style"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="space-y-2">
-                          {(["classic", "modern", "unique", "professional"] as const).map((style) => {
-                            const isSelected = field.value === style;
-                            return (
-                              <Button
-                                key={style}
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className={`btn-visible w-full p-2 font-medium text-xs ${
-                                  isSelected
-                                    ? "bg-neon-purple/20 border-neon-purple text-neon-purple font-semibold"
-                                    : "bg-dark-tertiary border-gray-600 text-gray-300 hover:border-neon-purple hover:text-white"
-                                }`}
-                                onClick={() => field.onChange(style)}
-                              >
-                                {style === "classic" && "Clássico"}
-                                {style === "modern" && "Moderno"}
-                                {style === "unique" && "Único"}
-                                {style === "professional" && "Profissional"}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
             {/* Length Settings */}
             <div>
               <Label className="text-sm font-semibold text-white mb-3 block">
@@ -463,48 +329,6 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                         />
                       </FormControl>
                       <Label className="text-sm text-gray-300 font-medium cursor-pointer">Capitalização</Label>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Advanced Preferences */}
-            <div>
-              <Label className="text-sm font-semibold text-white mb-3 block">
-                <Zap className="inline mr-2 h-4 w-4" />
-                Preferências Avançadas
-              </Label>
-              <div className="space-y-3">
-                <FormField
-                  control={form.control}
-                  name="avoidCommonWords"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-3">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-neon-green data-[state=checked]:border-neon-green border-2 w-5 h-5"
-                        />
-                      </FormControl>
-                      <Label className="text-sm text-gray-300 font-medium cursor-pointer">Evitar palavras comuns</Label>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="preferShortWords"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-3">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-neon-green data-[state=checked]:border-neon-green border-2 w-5 h-5"
-                        />
-                      </FormControl>
-                      <Label className="text-sm text-gray-300 font-medium cursor-pointer">Preferir palavras curtas</Label>
                     </FormItem>
                   )}
                 />
