@@ -59,31 +59,49 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
   
   let nickname = prefix + suffix;
   
-  // Add numbers if requested
+  // Add numbers if requested and there's space
   if (includeNumbers && Math.random() > 0.5) {
     const number = Math.floor(Math.random() * 999) + 1;
-    nickname += number.toString();
+    const numberStr = number.toString();
+    // Only add if it doesn't exceed maxLength
+    if (nickname.length + numberStr.length <= maxLength) {
+      nickname += numberStr;
+    }
   }
   
-  // Add special characters if requested
+  // Add special characters if requested and there's space
   if (includeSpecialChars && Math.random() > 0.7) {
     const specialChars = ["_", "-", ".", "!"];
     const char = getRandomElement(specialChars);
+    const syllable = getRandomElement(words.syllables);
+    
     if (Math.random() > 0.5) {
-      nickname = nickname + char + getRandomElement(words.syllables);
+      const addition = char + syllable;
+      if (nickname.length + addition.length <= maxLength) {
+        nickname = nickname + addition;
+      }
     } else {
-      nickname = getRandomElement(words.syllables) + char + nickname;
+      const addition = syllable + char;
+      if (addition.length + nickname.length <= maxLength) {
+        nickname = addition + nickname;
+      }
     }
   }
   
   // Ensure length constraints
   if (nickname.length < minLength) {
     const extraSyllables = Math.ceil((minLength - nickname.length) / 3);
-    for (let i = 0; i < extraSyllables; i++) {
-      nickname += getRandomElement(words.syllables);
+    for (let i = 0; i < extraSyllables && nickname.length < maxLength; i++) {
+      const syllable = getRandomElement(words.syllables);
+      if (nickname.length + syllable.length <= maxLength) {
+        nickname += syllable;
+      } else {
+        break;
+      }
     }
   }
   
+  // Final length check - ensure we never exceed maxLength
   if (nickname.length > maxLength) {
     nickname = nickname.substring(0, maxLength);
   }
@@ -93,7 +111,11 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
 
 function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean): string {
   const words = themeWords[theme];
-  const targetLength = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+  
+  // Reserve space for numbers if requested
+  const numberSpace = includeNumbers ? 2 : 0;
+  const effectiveMaxLength = maxLength - numberSpace;
+  const targetLength = Math.floor(Math.random() * (effectiveMaxLength - minLength + 1)) + minLength;
   
   let nickname = "";
   let syllableCount = 0;
@@ -101,28 +123,40 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
   
   while (nickname.length < targetLength && syllableCount < maxSyllables) {
     const syllable = getRandomElement(words.syllables);
-    nickname += syllable;
-    syllableCount++;
-    
-    if (nickname.length >= targetLength) break;
+    if (nickname.length + syllable.length <= effectiveMaxLength) {
+      nickname += syllable;
+      syllableCount++;
+    } else {
+      break;
+    }
   }
   
   // Capitalize first letter
-  nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
-  
-  // Add numbers if requested and there's space
-  if (includeNumbers && nickname.length < maxLength - 2) {
-    const number = Math.floor(Math.random() * 99) + 1;
-    nickname += number.toString();
+  if (nickname.length > 0) {
+    nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
   }
   
+  // Add numbers if requested and there's space
+  if (includeNumbers && nickname.length < maxLength - 1) {
+    const number = Math.floor(Math.random() * 99) + 1;
+    const numberStr = number.toString();
+    if (nickname.length + numberStr.length <= maxLength) {
+      nickname += numberStr;
+    }
+  }
+  
+  // Final length check
   return nickname.substring(0, maxLength);
 }
 
 function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, useCapitalization: boolean): string {
   const words = themeWords[theme];
   
-  // Choose combination pattern
+  // Reserve space for numbers if requested
+  const numberSpace = includeNumbers ? 3 : 0;
+  const effectiveMaxLength = maxLength - numberSpace;
+  
+  // Choose combination pattern based on available space
   const patterns = [
     () => getRandomElement(words.prefixes) + getRandomElement(words.suffixes),
     () => getRandomElement(words.prefixes) + getRandomElement(words.syllables) + getRandomElement(words.suffixes),
@@ -131,6 +165,11 @@ function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLe
   ];
   
   let nickname = getRandomElement(patterns)();
+  
+  // Trim to effective max length before adding numbers
+  if (nickname.length > effectiveMaxLength) {
+    nickname = nickname.substring(0, effectiveMaxLength);
+  }
   
   // Apply capitalization
   if (useCapitalization) {
@@ -144,26 +183,39 @@ function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLe
     }
   }
   
-  // Add numbers strategically
+  // Add numbers strategically if there's space
   if (includeNumbers) {
     const numberPos = Math.random();
     const number = Math.floor(Math.random() * 999) + 1;
+    const numberStr = number.toString();
     
     if (numberPos > 0.7) {
-      nickname = number.toString() + nickname;
+      // Add at beginning
+      if (numberStr.length + nickname.length <= maxLength) {
+        nickname = numberStr + nickname;
+      }
     } else {
-      nickname = nickname + number.toString();
+      // Add at end
+      if (nickname.length + numberStr.length <= maxLength) {
+        nickname = nickname + numberStr;
+      }
     }
   }
   
-  // Ensure length constraints
+  // Ensure minimum length constraints
   if (nickname.length < minLength) {
     const extraSyllables = Math.ceil((minLength - nickname.length) / 3);
-    for (let i = 0; i < extraSyllables; i++) {
-      nickname += getRandomElement(words.syllables);
+    for (let i = 0; i < extraSyllables && nickname.length < maxLength; i++) {
+      const syllable = getRandomElement(words.syllables);
+      if (nickname.length + syllable.length <= maxLength) {
+        nickname += syllable;
+      } else {
+        break;
+      }
     }
   }
   
+  // Final length check - absolutely ensure we never exceed maxLength
   return nickname.substring(0, maxLength);
 }
 
