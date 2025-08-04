@@ -54,46 +54,34 @@ function getRandomElement<T>(array: T[]): T {
 
 function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, includeSpecialChars: boolean): string {
   const words = themeWords[theme];
-  const prefix = getRandomElement(words.prefixes);
-  const suffix = getRandomElement(words.suffixes);
   
-  let nickname = prefix + suffix;
+  // Calculate space allocation
+  const numberSpace = includeNumbers ? 2 : 0;
+  const specialCharSpace = includeSpecialChars ? 2 : 0;
+  const reservedSpace = numberSpace + specialCharSpace;
+  const baseSpace = Math.max(4, maxLength - reservedSpace); // At least 4 chars for base
   
-  // Add numbers if requested and there's space
-  if (includeNumbers && Math.random() > 0.5) {
-    const number = Math.floor(Math.random() * 999) + 1;
-    const numberStr = number.toString();
-    // Only add if it doesn't exceed maxLength
-    if (nickname.length + numberStr.length <= maxLength) {
-      nickname += numberStr;
-    }
-  }
+  // Build base nickname within allocated space
+  let nickname = "";
   
-  // Add special characters if requested and there's space
-  if (includeSpecialChars && Math.random() > 0.7) {
-    const specialChars = ["_", "-", ".", "!"];
-    const char = getRandomElement(specialChars);
-    const syllable = getRandomElement(words.syllables);
-    
+  // Try different combinations to fit the space
+  if (baseSpace >= 8) {
+    // Full prefix + suffix
+    const prefix = getRandomElement(words.prefixes);
+    const suffix = getRandomElement(words.suffixes);
+    nickname = prefix + suffix;
+  } else {
+    // Use shorter combinations
     if (Math.random() > 0.5) {
-      const addition = char + syllable;
-      if (nickname.length + addition.length <= maxLength) {
-        nickname = nickname + addition;
-      }
+      nickname = getRandomElement(words.prefixes);
     } else {
-      const addition = syllable + char;
-      if (addition.length + nickname.length <= maxLength) {
-        nickname = addition + nickname;
-      }
+      nickname = getRandomElement(words.suffixes);
     }
-  }
-  
-  // Ensure length constraints
-  if (nickname.length < minLength) {
-    const extraSyllables = Math.ceil((minLength - nickname.length) / 3);
-    for (let i = 0; i < extraSyllables && nickname.length < maxLength; i++) {
+    
+    // Add syllables if there's space
+    while (nickname.length < baseSpace - 2) {
       const syllable = getRandomElement(words.syllables);
-      if (nickname.length + syllable.length <= maxLength) {
+      if (nickname.length + syllable.length <= baseSpace) {
         nickname += syllable;
       } else {
         break;
@@ -101,12 +89,53 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
     }
   }
   
-  // Final length check - ensure we never exceed maxLength
-  if (nickname.length > maxLength) {
-    nickname = nickname.substring(0, maxLength);
+  // Trim base to fit reserved space
+  if (nickname.length > baseSpace) {
+    nickname = nickname.substring(0, baseSpace);
   }
   
-  return nickname;
+  // Add numbers if requested
+  if (includeNumbers && nickname.length < maxLength - 1) {
+    const maxNumber = Math.pow(10, Math.min(2, maxLength - nickname.length)) - 1;
+    const number = Math.floor(Math.random() * maxNumber) + 1;
+    const numberStr = number.toString();
+    if (nickname.length + numberStr.length <= maxLength) {
+      nickname += numberStr;
+    }
+  }
+  
+  // Add special characters if requested and there's still space
+  if (includeSpecialChars && nickname.length < maxLength - 1) {
+    const specialChars = ["_", "-", ".", "!"];
+    const char = getRandomElement(specialChars);
+    
+    if (nickname.length + char.length <= maxLength) {
+      if (Math.random() > 0.5 && nickname.length + char.length + 2 <= maxLength) {
+        const syllable = getRandomElement(words.syllables).substring(0, 2);
+        nickname = nickname + char + syllable;
+      } else {
+        nickname = nickname + char;
+      }
+    }
+  }
+  
+  // Ensure minimum length by adding syllables
+  while (nickname.length < minLength && nickname.length < maxLength) {
+    const syllable = getRandomElement(words.syllables);
+    if (nickname.length + syllable.length <= maxLength) {
+      nickname += syllable;
+    } else {
+      // Add partial syllable if needed
+      const remaining = maxLength - nickname.length;
+      if (remaining > 0) {
+        nickname += syllable.substring(0, remaining);
+      }
+      break;
+    }
+  }
+  
+  // Final length check
+  return nickname.substring(0, maxLength);
 }
 
 function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean): string {
@@ -114,8 +143,8 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
   
   // Reserve space for numbers if requested
   const numberSpace = includeNumbers ? 2 : 0;
-  const effectiveMaxLength = maxLength - numberSpace;
-  const targetLength = Math.floor(Math.random() * (effectiveMaxLength - minLength + 1)) + minLength;
+  const baseSpace = maxLength - numberSpace;
+  const targetLength = Math.max(2, Math.min(baseSpace, Math.floor(Math.random() * (baseSpace - 2 + 1)) + 2));
   
   let nickname = "";
   let syllableCount = 0;
@@ -123,10 +152,15 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
   
   while (nickname.length < targetLength && syllableCount < maxSyllables) {
     const syllable = getRandomElement(words.syllables);
-    if (nickname.length + syllable.length <= effectiveMaxLength) {
+    if (nickname.length + syllable.length <= targetLength) {
       nickname += syllable;
       syllableCount++;
     } else {
+      // Add partial syllable if it helps reach target
+      const remaining = targetLength - nickname.length;
+      if (remaining > 0 && remaining < syllable.length) {
+        nickname += syllable.substring(0, remaining);
+      }
       break;
     }
   }
@@ -136,12 +170,13 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
     nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
   }
   
-  // Add numbers if requested and there's space
-  if (includeNumbers && nickname.length < maxLength - 1) {
-    const number = Math.floor(Math.random() * 99) + 1;
-    const numberStr = number.toString();
-    if (nickname.length + numberStr.length <= maxLength) {
-      nickname += numberStr;
+  // Force add numbers if requested
+  if (includeNumbers) {
+    const availableSpace = maxLength - nickname.length;
+    if (availableSpace >= 1) {
+      const maxNumber = Math.pow(10, Math.min(2, availableSpace)) - 1;
+      const number = Math.floor(Math.random() * maxNumber) + 1;
+      nickname += number.toString();
     }
   }
   
@@ -153,27 +188,47 @@ function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLe
   const words = themeWords[theme];
   
   // Reserve space for numbers if requested
-  const numberSpace = includeNumbers ? 3 : 0;
-  const effectiveMaxLength = maxLength - numberSpace;
+  const numberSpace = includeNumbers ? 2 : 0;
+  const baseSpace = maxLength - numberSpace;
   
-  // Choose combination pattern based on available space
-  const patterns = [
-    () => getRandomElement(words.prefixes) + getRandomElement(words.suffixes),
-    () => getRandomElement(words.prefixes) + getRandomElement(words.syllables) + getRandomElement(words.suffixes),
-    () => getRandomElement(words.syllables) + getRandomElement(words.prefixes),
-    () => getRandomElement(words.suffixes) + getRandomElement(words.syllables),
-  ];
+  // Choose pattern based on available space
+  let nickname = "";
   
-  let nickname = getRandomElement(patterns)();
+  if (baseSpace >= 8) {
+    // Full combinations
+    const patterns = [
+      () => getRandomElement(words.prefixes) + getRandomElement(words.suffixes),
+      () => getRandomElement(words.prefixes) + getRandomElement(words.syllables) + getRandomElement(words.suffixes),
+      () => getRandomElement(words.syllables) + getRandomElement(words.prefixes),
+      () => getRandomElement(words.suffixes) + getRandomElement(words.syllables),
+    ];
+    nickname = getRandomElement(patterns)();
+  } else {
+    // Shorter combinations for limited space
+    if (Math.random() > 0.5) {
+      nickname = getRandomElement(words.prefixes);
+    } else {
+      nickname = getRandomElement(words.suffixes);
+    }
+    
+    // Add syllables to fill space
+    while (nickname.length < baseSpace - 2) {
+      const syllable = getRandomElement(words.syllables);
+      if (nickname.length + syllable.length <= baseSpace) {
+        nickname += syllable;
+      } else {
+        break;
+      }
+    }
+  }
   
-  // Trim to effective max length before adding numbers
-  if (nickname.length > effectiveMaxLength) {
-    nickname = nickname.substring(0, effectiveMaxLength);
+  // Trim to base space
+  if (nickname.length > baseSpace) {
+    nickname = nickname.substring(0, baseSpace);
   }
   
   // Apply capitalization
   if (useCapitalization) {
-    // Random capitalization pattern
     if (Math.random() > 0.5) {
       nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
     } else {
@@ -183,39 +238,39 @@ function generateThematicNickname(theme: NicknameTheme, minLength: number, maxLe
     }
   }
   
-  // Add numbers strategically if there's space
+  // Force add numbers if requested
   if (includeNumbers) {
-    const numberPos = Math.random();
-    const number = Math.floor(Math.random() * 999) + 1;
-    const numberStr = number.toString();
-    
-    if (numberPos > 0.7) {
-      // Add at beginning
-      if (numberStr.length + nickname.length <= maxLength) {
+    const availableSpace = maxLength - nickname.length;
+    if (availableSpace >= 1) {
+      const maxNumber = Math.pow(10, Math.min(3, availableSpace)) - 1;
+      const number = Math.floor(Math.random() * maxNumber) + 1;
+      const numberStr = number.toString();
+      
+      if (Math.random() > 0.7 && numberStr.length <= availableSpace) {
+        // Add at beginning
         nickname = numberStr + nickname;
-      }
-    } else {
-      // Add at end
-      if (nickname.length + numberStr.length <= maxLength) {
+      } else if (numberStr.length <= availableSpace) {
+        // Add at end
         nickname = nickname + numberStr;
       }
     }
   }
   
-  // Ensure minimum length constraints
-  if (nickname.length < minLength) {
-    const extraSyllables = Math.ceil((minLength - nickname.length) / 3);
-    for (let i = 0; i < extraSyllables && nickname.length < maxLength; i++) {
-      const syllable = getRandomElement(words.syllables);
-      if (nickname.length + syllable.length <= maxLength) {
-        nickname += syllable;
-      } else {
-        break;
+  // Ensure minimum length
+  while (nickname.length < minLength && nickname.length < maxLength) {
+    const syllable = getRandomElement(words.syllables);
+    if (nickname.length + syllable.length <= maxLength) {
+      nickname += syllable;
+    } else {
+      const remaining = maxLength - nickname.length;
+      if (remaining > 0) {
+        nickname += syllable.substring(0, remaining);
       }
+      break;
     }
   }
   
-  // Final length check - absolutely ensure we never exceed maxLength
+  // Final length check
   return nickname.substring(0, maxLength);
 }
 
