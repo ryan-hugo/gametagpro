@@ -34,19 +34,23 @@ const themeWords = {
   }
 };
 
-// Syllable combinations for syllabic generation
-const syllableCombinations = [
-  ["con", "so", "nant"],
-  ["vow", "el", "sounds"],
-  ["syl", "la", "bles"],
-  ["rhy", "thm", "ic"],
-  ["pho", "net", "ic"],
-  ["mor", "phe", "mic"],
-  ["lex", "i", "cal"],
-  ["syn", "tax", "is"],
-  ["gram", "mar", "ly"],
-  ["sem", "an", "tic"]
-];
+// Enhanced syllable patterns for more natural generation
+const syllablePatterns = {
+  consonants: ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z"],
+  vowels: ["a", "e", "i", "o", "u"],
+  consonantClusters: ["br", "cr", "dr", "fr", "gr", "pr", "tr", "bl", "cl", "fl", "gl", "pl", "sl", "sp", "st", "sc", "sk", "sm", "sn", "sw"],
+  vowelCombinations: ["ai", "au", "ea", "ei", "ie", "oa", "ou", "ue"],
+  endings: ["er", "ar", "or", "en", "an", "on", "ex", "ax", "ix", "ox", "ux"]
+};
+
+// Advanced syllable combinations for different themes
+const advancedSyllables = {
+  strong: ["thor", "grim", "storm", "iron", "steel", "war", "rage", "fire", "blood", "death"],
+  soft: ["silk", "moon", "star", "dawn", "mist", "pearl", "rose", "snow", "wind", "sky"],
+  mystical: ["mage", "rune", "spell", "myth", "sage", "lore", "void", "ether", "soul", "spirit"],
+  tech: ["byte", "code", "data", "cyber", "neo", "sync", "link", "node", "core", "net"],
+  nature: ["leaf", "root", "bark", "fern", "moss", "pine", "oak", "elm", "ash", "ivy"]
+};
 
 function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
@@ -144,30 +148,93 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
   // Reserve space for numbers if requested
   const numberSpace = includeNumbers ? 2 : 0;
   const baseSpace = maxLength - numberSpace;
-  const targetLength = Math.max(2, Math.min(baseSpace, Math.floor(Math.random() * (baseSpace - 2 + 1)) + 2));
+  const targetLength = Math.max(3, Math.min(baseSpace, Math.floor(Math.random() * (baseSpace - 3 + 1)) + 3));
   
   let nickname = "";
-  let syllableCount = 0;
-  const maxSyllables = Math.ceil(targetLength / 2);
+  const syllableCount = Math.floor(Math.random() * 3) + 2; // 2-4 syllables
   
-  while (nickname.length < targetLength && syllableCount < maxSyllables) {
-    const syllable = getRandomElement(words.syllables);
+  // Generate syllables using multiple approaches
+  for (let i = 0; i < syllableCount && nickname.length < targetLength - 2; i++) {
+    let syllable = "";
+    const approach = Math.random();
+    
+    if (approach < 0.3) {
+      // Use theme-specific syllables
+      syllable = getRandomElement(words.syllables);
+    } else if (approach < 0.5) {
+      // Use advanced thematic syllables
+      const themeMapping: { [key in NicknameTheme]: keyof typeof advancedSyllables } = {
+        fantasy: "mystical",
+        "sci-fi": "tech",
+        military: "strong",
+        cute: "soft",
+        edgy: "strong",
+        neutral: "nature"
+      };
+      syllable = getRandomElement(advancedSyllables[themeMapping[theme]]);
+    } else if (approach < 0.7) {
+      // Generate phonetic syllables
+      const consonant = getRandomElement(syllablePatterns.consonants);
+      const vowel = getRandomElement(syllablePatterns.vowels);
+      const ending = Math.random() > 0.5 ? getRandomElement(syllablePatterns.consonants) : "";
+      syllable = consonant + vowel + ending;
+    } else if (approach < 0.85) {
+      // Use consonant clusters
+      const cluster = getRandomElement(syllablePatterns.consonantClusters);
+      const vowel = Math.random() > 0.5 ? 
+        getRandomElement(syllablePatterns.vowels) : 
+        getRandomElement(syllablePatterns.vowelCombinations);
+      syllable = cluster + vowel;
+    } else {
+      // Complex patterns
+      const start = Math.random() > 0.5 ? 
+        getRandomElement(syllablePatterns.consonantClusters) : 
+        getRandomElement(syllablePatterns.consonants);
+      const middle = getRandomElement(syllablePatterns.vowelCombinations);
+      const end = getRandomElement(syllablePatterns.endings);
+      syllable = start + middle + end;
+    }
+    
+    // Ensure we don't exceed target length
     if (nickname.length + syllable.length <= targetLength) {
       nickname += syllable;
-      syllableCount++;
     } else {
-      // Add partial syllable if it helps reach target
+      // Add partial syllable to fill remaining space
       const remaining = targetLength - nickname.length;
-      if (remaining > 0 && remaining < syllable.length) {
+      if (remaining > 0) {
         nickname += syllable.substring(0, remaining);
       }
       break;
     }
   }
   
-  // Capitalize first letter
+  // Ensure minimum length with additional syllables
+  while (nickname.length < Math.min(minLength, targetLength)) {
+    const shortSyllable = getRandomElement(words.syllables);
+    if (nickname.length + shortSyllable.length <= targetLength) {
+      nickname += shortSyllable;
+    } else {
+      break;
+    }
+  }
+  
+  // Apply random capitalization patterns
   if (nickname.length > 0) {
-    nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
+    const capPattern = Math.random();
+    if (capPattern < 0.6) {
+      // Standard capitalization
+      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+    } else if (capPattern < 0.8) {
+      // Alternate case
+      nickname = nickname.split('').map((char, index) => 
+        index % 2 === 0 ? char.toUpperCase() : char.toLowerCase()
+      ).join('');
+    } else {
+      // Random caps
+      nickname = nickname.split('').map(char => 
+        Math.random() > 0.7 ? char.toUpperCase() : char.toLowerCase()
+      ).join('');
+    }
   }
   
   // Force add numbers if requested
@@ -176,7 +243,13 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
     if (availableSpace >= 1) {
       const maxNumber = Math.pow(10, Math.min(2, availableSpace)) - 1;
       const number = Math.floor(Math.random() * maxNumber) + 1;
-      nickname += number.toString();
+      
+      // Random number placement
+      if (Math.random() > 0.7 && availableSpace >= 2) {
+        nickname = number.toString() + nickname;
+      } else {
+        nickname += number.toString();
+      }
     }
   }
   
