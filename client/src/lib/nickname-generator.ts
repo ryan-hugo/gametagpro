@@ -142,7 +142,7 @@ function generateRandomNickname(theme: NicknameTheme, minLength: number, maxLeng
   return nickname.substring(0, maxLength);
 }
 
-function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean): string {
+function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLength: number, includeNumbers: boolean, useCapitalization: boolean = true): string {
   const words = themeWords[theme];
   
   // Reserve space for numbers if requested
@@ -234,9 +234,12 @@ function generateSyllabicNickname(theme: NicknameTheme, minLength: number, maxLe
     }
   }
   
-  // Apply capitalization (simplified to avoid length issues)
-  if (nickname.length > 0) {
+  // Apply capitalization only if requested
+  if (nickname.length > 0 && useCapitalization) {
     nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+  } else if (nickname.length > 0) {
+    // Ensure all lowercase when capitalization is disabled
+    nickname = nickname.toLowerCase();
   }
   
   // Add numbers if requested and there's space
@@ -369,7 +372,7 @@ export function generateNicknames(params: GenerationParameters): string[] {
         nickname = generateRandomNickname(theme, minLength, maxLength, includeNumbers, includeSpecialChars);
         break;
       case "syllabic":
-        nickname = generateSyllabicNickname(theme, minLength, maxLength, includeNumbers);
+        nickname = generateSyllabicNickname(theme, minLength, maxLength, includeNumbers, useCapitalization);
         break;
       case "thematic":
         nickname = generateThematicNickname(theme, minLength, maxLength, includeNumbers, useCapitalization);
