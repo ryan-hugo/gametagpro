@@ -379,7 +379,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   type="button"
                   variant="outline"
                   onClick={handleClear}
-                  className="bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                  className="btn-visible bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white font-medium"
                 >
                   <RotateCcw className="mr-1 h-4 w-4" />
                   Limpar
@@ -388,7 +388,7 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
                   type="button"
                   variant="outline"
                   onClick={handleExport}
-                  className="bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                  className="btn-visible bg-dark-tertiary border-gray-600 text-gray-300 hover:border-neon-green hover:text-white font-medium"
                 >
                   <Download className="mr-1 h-4 w-4" />
                   Exportar

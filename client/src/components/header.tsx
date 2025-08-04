@@ -26,8 +26,11 @@ export function Header() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-electric-blue to-neon-green bg-clip-text text-transparent">
-                GameName Generator
+              <h1 className="text-xl font-bold text-white dark:text-white">
+                <span className="text-electric-blue font-bold">
+                  GameName
+                </span>{" "}
+                <span className="text-white font-bold">Generator</span>
               </h1>
               <p className="text-xs text-gray-400">Gerador de Nicknames</p>
             </div>
@@ -38,10 +41,10 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className={`transition-all duration-200 ${
+                className={`btn-visible transition-all duration-200 ${
                   location === "/" 
-                    ? "bg-electric-blue bg-opacity-20 border-electric-blue text-electric-blue" 
-                    : "bg-dark-tertiary border-gray-600 hover:border-electric-blue text-gray-400"
+                    ? "bg-electric-blue/20 border-electric-blue text-electric-blue font-semibold" 
+                    : "bg-dark-tertiary border-gray-600 hover:border-electric-blue text-gray-300 hover:text-white"
                 }`}
                 title="Página inicial"
               >
@@ -53,10 +56,10 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className={`transition-all duration-200 ${
+                className={`btn-visible transition-all duration-200 ${
                   location === "/favorites" 
-                    ? "bg-red-400 bg-opacity-20 border-red-400 text-red-400" 
-                    : "bg-dark-tertiary border-gray-600 hover:border-red-400 text-gray-400"
+                    ? "bg-red-400/20 border-red-400 text-red-400 font-semibold" 
+                    : "bg-dark-tertiary border-gray-600 hover:border-red-400 text-gray-300 hover:text-red-400"
                 }`}
                 title="Favoritos"
               >
@@ -68,7 +71,7 @@ export function Header() {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="bg-dark-tertiary border-gray-600 hover:border-electric-blue text-electric-blue transition-all duration-200"
+              className="btn-visible bg-dark-tertiary border-gray-600 hover:border-electric-blue text-electric-blue hover:text-white transition-all duration-200"
               title={theme === "dark" ? "Modo claro" : "Modo escuro"}
             >
               <Palette className="h-4 w-4" />

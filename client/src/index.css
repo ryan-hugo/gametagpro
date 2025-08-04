@@ -135,6 +135,27 @@
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out;
   }
+  
+  /* Ensure text visibility */
+  .text-gradient-fix {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 100%;
+    background-repeat: repeat;
+  }
+  
+  /* Button visibility fixes */
+  .btn-visible {
+    min-height: 36px;
+    border-width: 1px;
+    border-style: solid;
+  }
+  
+  .btn-visible:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 }
 
 @keyframes glow {

@@ -91,14 +91,14 @@ export default function Home() {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      className="bg-electric-blue bg-opacity-20 border-electric-blue text-electric-blue hover:bg-opacity-30"
+                      className="btn-visible bg-electric-blue/20 border-electric-blue text-electric-blue hover:bg-electric-blue/30 hover:text-white font-medium"
                     >
                       <Filter className="mr-2 h-4 w-4" />
                       Filtros
                     </Button>
                     <Button
                       variant="outline"
-                      className="bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                      className="btn-visible bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white font-medium"
                     >
                       <ArrowUpDown className="mr-2 h-4 w-4" />
                       Ordenar
@@ -142,7 +142,7 @@ export default function Home() {
                     <Button
                       onClick={() => setSearchQuery("")}
                       variant="outline"
-                      className="bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                      className="btn-visible bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white font-medium"
                     >
                       {searchQuery ? "Limpar busca" : "Gere alguns nicknames para começar"}
                     </Button>
@@ -164,7 +164,7 @@ export default function Home() {
                         <Button
                           onClick={handleLoadMore}
                           variant="outline"
-                          className="bg-dark-tertiary border-gray-600 text-gray-300 hover:border-gray-500"
+                          className="btn-visible bg-dark-tertiary border-gray-600 text-gray-300 hover:border-electric-blue hover:text-white font-medium"
                         >
                           <Plus className="mr-2 h-4 w-4" />
                           Carregar Mais
@@ -188,7 +188,7 @@ export default function Home() {
                     <Link href="/favorites">
                       <Button
                         variant="ghost"
-                        className="text-sm text-gray-400 hover:text-white"
+                        className="btn-visible text-sm text-gray-400 hover:text-white font-medium"
                       >
                         Ver todos
                       </Button>
