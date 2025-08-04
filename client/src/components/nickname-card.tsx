@@ -88,8 +88,9 @@ export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
     <div
       className={`group bg-gradient-to-br ${
         isFavorite ? gradientClass : "bg-dark-tertiary border border-gray-600 hover:border-electric-blue"
-      } rounded-lg p-4 hover:shadow-lg hover:shadow-electric-blue/10 transition-all duration-300 animate-slide-up`}
-      style={{ animationDelay: `${index * 0.1}s` }}
+      } rounded-lg p-4 hover:shadow-lg hover:shadow-electric-blue/10 transition-all duration-300 animate-slide-up cursor-pointer`}
+      style={{ animationDelay: `${index * 0.05}s` }}
+      onClick={handleCopy}
     >
       <div className="flex items-center justify-between mb-2">
         <span className={`font-gaming text-lg font-semibold ${
@@ -100,7 +101,10 @@ export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleFavorite}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFavorite();
+          }}
           disabled={toggleFavoriteMutation.isPending}
           className={`opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-600 transition-all ${
             isFavorite ? "opacity-100" : ""
@@ -128,7 +132,10 @@ export function NicknameCard({ nickname, index = 0 }: NicknameCardProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleCopy}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCopy();
+          }}
           className="p-2 hover:bg-gray-600 transition-colors group"
         >
           <Copy

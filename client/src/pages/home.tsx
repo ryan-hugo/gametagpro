@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Filter, ArrowUpDown, List, Plus } from "lucide-react";
+import { Search, Filter, ArrowUpDown, List, Plus, Heart } from "lucide-react";
+import { Link } from "wouter";
 
 import { Header } from "@/components/header";
 import { GenerationControls } from "@/components/generation-controls";
@@ -184,12 +185,14 @@ export default function Home() {
                       <Heart className="text-red-400 mr-2 h-5 w-5 fill-current" />
                       Favoritos
                     </CardTitle>
-                    <Button
-                      variant="ghost"
-                      className="text-sm text-gray-400 hover:text-white"
-                    >
-                      Ver todos
-                    </Button>
+                    <Link href="/favorites">
+                      <Button
+                        variant="ghost"
+                        className="text-sm text-gray-400 hover:text-white"
+                      >
+                        Ver todos
+                      </Button>
+                    </Link>
                   </div>
                 </CardHeader>
                 <CardContent>

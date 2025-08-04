@@ -335,6 +335,34 @@ export function GenerationControls({ onGenerate }: GenerationControlsProps) {
               </div>
             </div>
 
+            {/* Number of nicknames to generate */}
+            <div>
+              <FormField
+                control={form.control}
+                name="count"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-medium text-gray-300">Quantidade</Label>
+                      <span className="text-sm text-neon-green font-gaming">
+                        {field.value}
+                      </span>
+                    </div>
+                    <FormControl>
+                      <Slider
+                        min={1}
+                        max={50}
+                        step={1}
+                        value={[field.value]}
+                        onValueChange={(value) => field.onChange(value[0])}
+                        className="range-slider"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
             {/* Generation Controls */}
             <div className="space-y-3">
               <Button

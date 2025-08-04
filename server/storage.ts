@@ -33,6 +33,8 @@ export class MemStorage implements IStorage {
     const nickname: Nickname = {
       ...insertNickname,
       id,
+      isFavorite: insertNickname.isFavorite ?? false,
+      copyCount: insertNickname.copyCount ?? 0,
       createdAt: new Date(),
     };
     this.nicknames.set(id, nickname);

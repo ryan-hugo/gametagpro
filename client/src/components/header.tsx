@@ -1,9 +1,11 @@
-import { Settings, Palette } from "lucide-react";
+import { Settings, Palette, Heart, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/lib/theme-provider";
+import { Link, useLocation } from "wouter";
 
 export function Header() {
   const { setTheme, theme } = useTheme();
+  const [location] = useLocation();
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -31,22 +33,45 @@ export function Header() {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleTheme}
-              className="bg-dark-tertiary border-gray-600 hover:border-electric-blue text-electric-blue"
-            >
-              <Palette className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center space-x-2">
+            <Link href="/">
+              <Button
+                variant="outline"
+                size="sm"
+                className={`transition-all duration-200 ${
+                  location === "/" 
+                    ? "bg-electric-blue bg-opacity-20 border-electric-blue text-electric-blue" 
+                    : "bg-dark-tertiary border-gray-600 hover:border-electric-blue text-gray-400"
+                }`}
+                title="Página inicial"
+              >
+                <Home className="h-4 w-4" />
+              </Button>
+            </Link>
+            
+            <Link href="/favorites">
+              <Button
+                variant="outline"
+                size="sm"
+                className={`transition-all duration-200 ${
+                  location === "/favorites" 
+                    ? "bg-red-400 bg-opacity-20 border-red-400 text-red-400" 
+                    : "bg-dark-tertiary border-gray-600 hover:border-red-400 text-gray-400"
+                }`}
+                title="Favoritos"
+              >
+                <Heart className="h-4 w-4" />
+              </Button>
+            </Link>
             
             <Button
               variant="outline"
               size="sm"
-              className="bg-dark-tertiary border-gray-600 hover:border-gray-500 text-gray-400"
+              onClick={toggleTheme}
+              className="bg-dark-tertiary border-gray-600 hover:border-electric-blue text-electric-blue transition-all duration-200"
+              title={theme === "dark" ? "Modo claro" : "Modo escuro"}
             >
-              <Settings className="h-4 w-4" />
+              <Palette className="h-4 w-4" />
             </Button>
           </div>
         </div>
